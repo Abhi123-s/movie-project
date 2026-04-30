@@ -1,44 +1,25 @@
 import MovieCard from "../components/MovieCard";
-import { useState , useEffect } from "react";
-import { searchPopularMovies , getPopularMovies } from '../services/api';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPopularMovies, searchMovies, selectMovies, selectMoviesLoading, selectMoviesError } from "../store/moviesSlice";
 import '../css/Home.css';
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [movies, setMovies] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  
+  const movies = useSelector(selectMovies);
+  const loading = useSelector(selectMoviesLoading);
+  const error = useSelector(selectMoviesError);
 
   useEffect(() => {
-    const loadPopularMovies = async () => {
-      try {
-        const popularMovies = await getPopularMovies();
-        setMovies(popularMovies);
-      } catch (error) {
-        console.log(error);
-        setError("Failed to fetch popular movies");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPopularMovies();
-  }, []);
+    dispatch(fetchPopularMovies());
+  }, [dispatch]);
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-
-    setLoading(true);
-    try {
-      const searchResults = await searchPopularMovies(searchQuery);
-      setMovies(searchResults);
-      setError(null);
-    } catch (error) {
-      console.log(error);
-      setError("Failed to fetch search results");
-    } finally {
-      setLoading(false);
-    }
+    dispatch(searchMovies(searchQuery));
   };
 
   return (

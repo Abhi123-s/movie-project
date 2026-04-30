@@ -1,14 +1,16 @@
 import "../css/MovieCard.css";
-import { useMovieContext } from "../contexts/MovieContext";
+import { useDispatch, useSelector } from "react-redux";
+import { addFavourite, removeFavourite, selectIsFavourite } from "../store/favouritesSlice";
 
 function MovieCard({ movie }) {
-  const { addToFavourites, removeFromFavourites, isFavourite } = useMovieContext();
+  const dispatch = useDispatch();
+  const isFav = useSelector((state) => selectIsFavourite(state, movie.id));
 
   const toggleFavourite = () => {
-    if (isFavourite(movie.id)) {
-      removeFromFavourites(movie.id);
+    if (isFav) {
+      dispatch(removeFavourite(movie.id));
     } else {
-      addToFavourites(movie);
+      dispatch(addFavourite(movie));
     }
   };
 
@@ -21,10 +23,10 @@ function MovieCard({ movie }) {
         />
         <div className="movie-overlay">
           <button
-            className={`favourite-btn ${isFavourite(movie.id) ? "active" : ""}`}
+            className={`favourite-btn ${isFav ? "active" : ""}`}
             onClick={toggleFavourite}
           >
-            {isFavourite(movie.id) ? "❤️" : "🤍"}
+            {isFav ? "❤️" : "🤍"}
           </button>
         </div>
       </div>
